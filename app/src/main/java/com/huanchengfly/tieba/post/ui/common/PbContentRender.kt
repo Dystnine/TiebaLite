@@ -1,6 +1,7 @@
 package com.huanchengfly.tieba.post.ui.common
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.waitForUpOrCancellation
@@ -99,7 +100,7 @@ data class TextContentRender(
         ) {
             val lastRender = lastOrNull()
             if (lastRender is TextContentRender) {
-                removeLast()
+                removeAt(lastIndex)
                 add(lastRender + text)
             } else
                 add(TextContentRender(text))
@@ -110,7 +111,7 @@ data class TextContentRender(
         ) {
             val lastRender = lastOrNull()
             if (lastRender is TextContentRender) {
-                removeLast()
+                removeAt(lastIndex)
                 add(lastRender + text)
             } else
                 add(TextContentRender(text))
@@ -137,8 +138,9 @@ data class PicContentRender(
 
         NetworkImage(
             imageUri = picUrl,
-            contentDescription = null,
+            contentDescription = stringResource(id = R.string.desc_image),
             modifier = Modifier
+                .focusable()
                 .clip(RoundedCornerShape(context.appPreferences.radius.dp))
                 .fillMaxWidth(widthFraction)
                 .aspectRatio(width * 1f / height),
@@ -166,7 +168,7 @@ data class VoiceContentRender(
     }
 
     override fun toString(): String {
-        return "[视频]"
+        return "[语音]"
     }
 }
 
@@ -222,7 +224,7 @@ data class VideoContentRender(
     }
 
     override fun toString(): String {
-        return "[语音]"
+        return "[视频]"
     }
 }
 
