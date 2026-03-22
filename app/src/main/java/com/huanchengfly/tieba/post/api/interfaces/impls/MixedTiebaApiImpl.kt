@@ -21,10 +21,12 @@ import com.huanchengfly.tieba.post.api.models.AgreeBean
 import com.huanchengfly.tieba.post.api.models.CheckReportBean
 import com.huanchengfly.tieba.post.api.models.CollectDataBean
 import com.huanchengfly.tieba.post.api.models.CommonResponse
+import com.huanchengfly.tieba.post.api.models.ForumGuideBean
 import com.huanchengfly.tieba.post.api.models.FollowBean
 import com.huanchengfly.tieba.post.api.models.ForumPageBean
 import com.huanchengfly.tieba.post.api.models.ForumRecommend
 import com.huanchengfly.tieba.post.api.models.GetForumListBean
+import com.huanchengfly.tieba.post.api.models.GetUserBlackInfoBean
 import com.huanchengfly.tieba.post.api.models.InitNickNameBean
 import com.huanchengfly.tieba.post.api.models.LikeForumResultBean
 import com.huanchengfly.tieba.post.api.models.LoginBean
@@ -32,6 +34,7 @@ import com.huanchengfly.tieba.post.api.models.MSignBean
 import com.huanchengfly.tieba.post.api.models.MessageListBean
 import com.huanchengfly.tieba.post.api.models.MsgBean
 import com.huanchengfly.tieba.post.api.models.NewCollectDataBean
+import com.huanchengfly.tieba.post.api.models.PermissionListBean
 import com.huanchengfly.tieba.post.api.models.PersonalizedBean
 import com.huanchengfly.tieba.post.api.models.PicPageBean
 import com.huanchengfly.tieba.post.api.models.Profile
@@ -129,7 +132,11 @@ import com.huanchengfly.tieba.post.utils.AccountUtil
 import com.huanchengfly.tieba.post.utils.CuidUtils
 import com.huanchengfly.tieba.post.utils.ImageUtil
 import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import okhttp3.RequestBody.Companion.asRequestBody
 import retrofit2.Call
 import java.io.File
@@ -984,7 +991,7 @@ object MixedTiebaApiImpl : ITiebaApi {
         return RetrofitTiebaApi.OFFICIAL_TIEBA_API.imgPortrait(
             MyMultipartBody.Builder("--------7da3d81520810*").apply {
                 setType(MyMultipartBody.FORM)
-                addFormDataPart(Param.CLIENT_VERSION, "11.10.8.6")
+                addFormDataPart(Param.CLIENT_VERSION, ClientVersion.TIEBA_V12.version)
                 addFormDataPart("pic", "file", file.asRequestBody())
             }.build()
         )
@@ -1538,4 +1545,75 @@ object MixedTiebaApiImpl : ITiebaApi {
             isHide,
             isTitle
         )
+
+    override fun setUserBlackFlow(
+        blackUid: Long,
+        tbs: String,
+        permList: PermissionListBean
+    ): Flow<CommonResponse> =
+        RetrofitTiebaApi.OFFICIAL_TIEBA_API.setUserBlackFlow(
+            blackUid,
+            tbs,
+            permList.toJson()
+        )
+
+    override fun getUserBlackInfoFlow(
+        blackUid: Long
+    ): Flow<GetUserBlackInfoBean> =
+        RetrofitTiebaApi.OFFICIAL_TIEBA_API.getUserBlackFlow(
+            blackUid
+        )
+
+    override fun forumGuideFlow(
+        sortType: Int?,
+        callFrom: Int?,
+        pageNo: Int,
+        resNum: Int,
+        topForumNum: Int?,
+    ): Flow<ForumGuideBean> =
+        RetrofitTiebaApi.OFFICIAL_TIEBA_API.forumGuideFlow(
+            sortType,
+            callFrom,
+            pageNo,
+            resNum,
+            topForumNum
+        )
+
+    /**
+     * 关注吧列表
+     * @param sortType 排序方式
+     * @param callFrom 1来自主页?(包含热搜数据),3 来自签到页?
+     */
+    override fun allForumGuideFlow(
+        sortType: Int?,
+        callFrom: Int?,
+    ): Flow<ForumGuideBean> = flow {
+        var currentPage = 1
+        var hasMore = true
+        var finalBean: ForumGuideBean? = null
+        val allLikeForums = mutableListOf<ForumGuideBean.LikeForum>()
+
+        while (hasMore) {
+            val response = forumGuideFlow(
+                sortType = sortType,
+                callFrom = callFrom,
+                pageNo = currentPage,
+                resNum = 50,
+                topForumNum = 0
+            ).first()
+            if (finalBean == null) {
+                finalBean = response
+            }
+            response.likeForum.let { allLikeForums.addAll(it) }
+            hasMore = response.likeForumHasMore == true
+            currentPage++
+        }
+
+        finalBean?.apply {
+            this.likeForum = allLikeForums
+        }?.let {
+            emit(it)
+        }
+    }.flowOn(Dispatchers.IO)
+
 }

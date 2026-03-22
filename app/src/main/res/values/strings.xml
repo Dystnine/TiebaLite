@@ -248,7 +248,7 @@
     <string name="text_stat_fans">粉丝</string>
     <string name="title_custom_font_size">字体大小</string>
     <string name="text_singing_progress">%1$s吧 ✓</string>
-    <string name="text_singing_progress_fail">%1$s吧 × %2$s</string>
+    <string name="text_singing_progress_fail">%1$s吧 : [%2$d]%3$s</string>
     <string name="text_singing_progress_exp">%1$s吧 ✓ 经验 +%2$s</string>
     <string name="title_start_sign">即将开始签到</string>
     <string name="toast_oksign_start">签到已开始，可在通知栏查看进度</string>
@@ -353,6 +353,8 @@
     <string name="desc_checked">已选中</string>
     <string name="title_oksign_use_official_oksign">使用官方一键签到</string>
     <string name="summary_oksign_use_official_oksign">先使用官方一键签到减少需签到吧数量，以加快签到速度</string>
+    <string name="title_oksign_fail_auto_stop">失败中止</string>
+    <string name="summary_oksign_fail_auto_stop">单个吧签到失败会停止后续签到流程</string>
     <string name="title_stat_posts_num">回贴</string>
     <string name="toast_feature_unavailable">该功能尚未实现</string>
     <string name="title_check_ci_update">接收自动构建版本更新</string>
@@ -452,6 +454,8 @@
     <string name="title_block_list">屏蔽词管理</string>
     <string name="settings_hide_blocked_content">彻底隐藏被屏蔽的内容</string>
     <string name="settings_block_video_summary">隐藏动态页面和吧页面的所有视频贴</string>
+    <string name="settings_show_followed_only">只推荐已关注的吧</string>
+    <string name="settings_show_followed_only_summary">在首页推荐中只会出现已经关注的吧的帖子</string>
     <string name="desc_image">图片</string>
     <string name="desc_add_image">添加图片</string>
     <string name="toast_upload_image_failed">上传图片失败 %s</string>
@@ -515,6 +519,8 @@
     <string name="title_user_hide_post">该用户已隐藏动态</string>
     <string name="menu_add_user_to_black_list">添加到黑名单</string>
     <string name="menu_add_user_to_white_list">添加到白名单</string>
+    <string name="ban_interact">拉黑</string>
+    <string name="toast_ban_interact_failed">更改拉黑配置失败 %1$s</string>
     <string name="btn_block">屏蔽选项</string>
     <string name="text_god_verify">%s领域大神</string>
     <string name="text_login_failed">登录失败 %s</string>

@@ -73,7 +73,7 @@ fun LoadMoreLayout(
     },
     lazyListState: LazyListState? = null,
     isEmpty: Boolean = lazyListState?.layoutInfo?.totalItemsCount == 0,
-    preloadCount: Int = 1,
+    preloadCount: Int = 3,
     content: @Composable () -> Unit,
 ) {
     val loadDistance = with(LocalDensity.current) { LoadDistance.toPx() }
@@ -227,7 +227,7 @@ private val <T> SwipeableState<T>.LoadPreDownPostUpNestedScrollConnection: Neste
     get() = object : NestedScrollConnection {
         override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
             val delta = available.toFloat()
-            return if (delta > 0 && source == NestedScrollSource.Drag) {
+            return if (delta > 0 && source == NestedScrollSource.Drag && offset.value < maxBound) {
                 performDrag(delta).toOffset()
             } else {
                 Offset.Zero
